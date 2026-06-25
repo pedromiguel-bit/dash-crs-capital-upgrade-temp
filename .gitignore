@@ -1,0 +1,21 @@
+# Dependências
+node_modules/
+
+# Segredos / variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Vault (conteúdo interno — não versionar)
+vault/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*

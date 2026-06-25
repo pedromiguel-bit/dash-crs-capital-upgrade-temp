@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Upgrade · Design System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Trinca tipográfica: Grotesca (display) + Serifa (corpo) + Mono (labels) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =====================================================================
+         CAPITAL UPGRADE — DESIGN SYSTEM
+         Derivado da identidade do Playbook Comercial "Processo de Indicação".
+         Tokens em :root · componentes abaixo · este arquivo é o style guide vivo.
+         ===================================================================== */
+
+      :root {
+        /* ---------- CORES ---------- */
+        /* Verdes de marca */
+        --caup-green: #15a34a;          /* primária (botões, badges, realces) */
+        --caup-green-strong: #0f8b3e;   /* hover/pressed */
+        --caup-accent: #3ddc84;         /* verde claro p/ texto em fundo ESCURO */
+        --caup-green-soft: #e4f4ea;     /* verde bem claro p/ realce em fundo CLARO */
+
+        /* Fundos escuros (capas, seções de destaque) */
+        --caup-bg-dark: #0a2e1e;        /* fundo seção escura */
+        --caup-bg-dark-2: #06190f;      /* card escuro / contraste profundo */
+        --caup-grad-dark: radial-gradient(130% 110% at 12% 0%, #123f2a 0%, #0a2e1e 45%, #061b11 100%);
+        --caup-grad-brand: linear-gradient(135deg, #34b06e 0%, #138a4a 38%, #0b3322 100%);
+
+        /* Fundos claros (off-white esverdeado) */
+        --caup-paper: #eef1ed;          /* fundo de página claro */
+        --caup-paper-card: #ffffff;     /* card claro */
+
+        /* Tinta / texto */
+        --caup-ink: #13201a;            /* títulos/escuro sobre claro */
+        --caup-ink-soft: #5b6b62;       /* secundário sobre claro */
+        --caup-white: #ffffff;          /* texto sobre escuro */
+        --caup-on-dark-soft: #9db5a8;   /* secundário sobre escuro */
+
+        /* Linhas / bordas */
+        --caup-line: #d8e0da;                 /* borda sobre claro */
+        --caup-line-dark: rgba(255, 255, 255, 0.14); /* borda sobre escuro */
+
+        /* ---------- TIPOGRAFIA ---------- */
+        --caup-font-display: 'Hanken Grotesk', 'Inter', system-ui, sans-serif; /* títulos */
+        --caup-font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;  /* corpo */
+        --caup-font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace; /* labels/números */
+
+        /* Escala (clamp = responsivo) */
+        --caup-fs-display: clamp(44px, 6.5vw, 84px);
+        --caup-fs-h1: clamp(34px, 4.6vw, 56px);
+        --caup-fs-h2: clamp(26px, 3vw, 38px);
+        --caup-fs-h3: 21px;
+        --caup-fs-lede: clamp(17px, 1.6vw, 21px);
+        --caup-fs-body: 16px;
+        --caup-fs-small: 14px;
+        --caup-fs-label: 12px;          /* eyebrow / mono */
+
+        --caup-track-label: 0.18em;     /* letter-spacing dos labels mono */
+
+        /* ---------- FORMA ---------- */
+        --caup-radius-sm: 8px;
+        --caup-radius: 12px;
+        --caup-radius-lg: 16px;
+        --caup-shadow: 0 1px 2px rgba(8, 26, 17, 0.05), 0 10px 30px rgba(8, 26, 17, 0.07);
+        --caup-space: 24px;
+      }
+
+      /* =====================================================================
+         BASE / RESET LEVE
+         ===================================================================== */
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--caup-paper);
+        color: var(--caup-ink);
+        font-family: var(--caup-font-body);
+        font-size: var(--caup-fs-body);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1, h2, h3, h4 { font-family: var(--caup-font-display); margin: 0; line-height: 1.02; }
+
+      /* =====================================================================
+         COMPONENTES DO SISTEMA
+         ===================================================================== */
+
+      /* --- Eyebrow / label mono (com ponto opcional) --- */
+      .caup-eyebrow {
+        font-family: var(--caup-font-mono);
+        font-size: var(--caup-fs-label);
+        font-weight: 600;
+        letter-spacing: var(--caup-track-label);
+        text-transform: uppercase;
+        color: var(--caup-green);
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .caup-eyebrow::before {
+        content: '';
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--caup-green);
+        flex: none;
+      }
+      .caup-eyebrow.no-dot::before { display: none; }
+      .on-dark .caup-eyebrow { color: var(--caup-accent); }
+      .on-dark .caup-eyebrow::before { background: var(--caup-accent); }
+
+      /* --- Títulos display (bicolor) --- */
+      .caup-display { font-size: var(--caup-fs-display); font-weight: 800; letter-spacing: -0.02em; }
+      .caup-h1 { font-size: var(--caup-fs-h1); font-weight: 800; letter-spacing: -0.015em; }
+      .caup-h2 { font-size: var(--caup-fs-h2); font-weight: 700; letter-spacing: -0.01em; }
+      .caup-h3 { font-size: var(--caup-fs-h3); font-weight: 700; }
+      .caup-accent-text { color: var(--caup-green); }
+      .on-dark .caup-accent-text { color: var(--caup-accent); }
+
+      /* Realce em bloco (fundo verde, texto branco) — "Se conquista." */
+      .caup-highlight {
+        background: var(--caup-green);
+        color: var(--caup-white);
+        padding: 0.02em 0.25em;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+      /* Régua curta abaixo de um título */
+      .caup-rule { width: 64px; height: 4px; background: var(--caup-green); border: none; margin: 18px 0 0; }
+
+      /* --- Lede / subtítulo --- */
+      .caup-lede { font-size: var(--caup-fs-lede); color: var(--caup-ink-soft); max-width: 60ch; }
+      .on-dark .caup-lede { color: var(--caup-on-dark-soft); }
+
+      /* --- Botão / pill --- */
+      .caup-btn {
+        font-family: var(--caup-font-display);
+        font-weight: 700; font-size: 14px;
+        background: var(--caup-green); color: #fff;
+        border: none; border-radius: 10px;
+        padding: 11px 20px; cursor: pointer; text-decoration: none;
+        display: inline-block;
+      }
+      .caup-btn:hover { background: var(--caup-green-strong); }
+      .caup-btn.ghost { background: transparent; color: var(--caup-ink); border: 1px solid var(--caup-line); }
+      .on-dark .caup-btn.ghost { color: #fff; border-color: var(--caup-line-dark); }
+
+      /* --- Badge numerado (quadrado verde) --- */
+      .caup-num-badge {
+        font-family: var(--caup-font-display); font-weight: 800;
+        background: var(--caup-green); color: #fff;
+        width: 44px; height: 44px; border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 18px; flex: none;
+      }
+
+      /* --- Número fantasma (contorno grande) — momentos --- */
+      .caup-ghost-num {
+        font-family: var(--caup-font-display); font-weight: 800;
+        font-size: clamp(64px, 8vw, 104px);
+        color: transparent;
+        -webkit-text-stroke: 2px var(--caup-green);
+        line-height: 0.9;
+      }
+
+      /* --- Card claro --- */
+      .caup-card {
+        background: var(--caup-paper-card);
+        border: 1px solid var(--caup-line);
+        border-radius: var(--caup-radius);
+        box-shadow: var(--caup-shadow);
+        padding: 22px 24px;
+      }
+      /* --- Card escuro (destaque / etapa ativa) --- */
+      .caup-card.dark {
+        background: var(--caup-bg-dark-2);
+        border-color: transparent;
+        color: var(--caup-white);
+        box-shadow: none;
+      }
+      .caup-card.dark .caup-h3 { color: var(--caup-accent); }
+      .caup-card.dark p { color: var(--caup-on-dark-soft); }
+
+      /* --- Callout com borda (Escopo) --- */
+      .caup-callout {
+        border: 1px solid var(--caup-line);
+        border-radius: var(--caup-radius);
+        padding: 14px 18px;
+        display: flex; gap: 10px; align-items: flex-start;
+        font-family: var(--caup-font-mono); font-size: 13px;
+      }
+      .caup-callout::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--caup-green); margin-top: 6px; flex: none;
+      }
+      .caup-callout b { color: var(--caup-green); }
+      .on-dark .caup-callout { border-color: var(--caup-line-dark); color: var(--caup-on-dark-soft); }
+      .on-dark .caup-callout::before, .on-dark .caup-callout b { color: var(--caup-accent); background: var(--caup-accent); }
+      .on-dark .caup-callout b { background: none; }
+
+      /* --- Bloco de SCRIPT (barra verde à esquerda, fundo escuro) --- */
+      .caup-script {
+        background: var(--caup-bg-dark-2);
+        border-left: 5px solid var(--caup-green);
+        border-radius: 0 var(--caup-radius) var(--caup-radius) 0;
+        padding: 20px 26px;
+        color: var(--caup-white);
+      }
+      .caup-script .caup-eyebrow { color: var(--caup-accent); margin-bottom: 10px; }
+      .caup-script .caup-eyebrow::before { background: var(--caup-accent); }
+      .caup-script p { font-size: 17px; margin: 0; }
+      .caup-script .key { color: var(--caup-accent); font-weight: 600; }
+
+      /* --- Timeline horizontal --- */
+      .caup-timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; position: relative; }
+      .caup-timeline::before {
+        content: ''; position: absolute; left: 8%; right: 8%; top: 54px; height: 2px;
+        background: linear-gradient(90deg, transparent, var(--caup-green) 15%, var(--caup-green) 85%, transparent);
+      }
+      .caup-tl-item { text-align: center; position: relative; }
+      .caup-tl-top { font-family: var(--caup-font-mono); font-size: 11px; letter-spacing: var(--caup-track-label); text-transform: uppercase; color: var(--caup-on-dark-soft); }
+      .caup-tl-dot {
+        width: 22px; height: 22px; border-radius: 50%;
+        border: 3px solid var(--caup-green); background: var(--caup-bg-dark);
+        margin: 14px auto; position: relative; z-index: 1;
+      }
+      .caup-tl-num { font-family: var(--caup-font-mono); font-size: 11px; letter-spacing: var(--caup-track-label); color: var(--caup-accent); text-transform: uppercase; }
+
+      /* --- Lista de passos (badge + título + descrição) --- */
+      .caup-step { display: flex; gap: 16px; align-items: center; padding: 16px 18px; }
+      .caup-step .caup-h3 { font-size: 18px; }
+      .caup-step p { margin: 2px 0 0; color: var(--caup-ink-soft); font-size: 14px; }
+
+      /* --- Do / Don't --- */
+      .caup-do, .caup-dont { border-radius: var(--caup-radius); padding: 24px 26px; }
+      .caup-do { background: var(--caup-green); color: #fff; }
+      .caup-dont { background: var(--caup-bg-dark-2); color: #fff; }
+      .caup-do .caup-col-title, .caup-dont .caup-col-title {
+        font-family: var(--caup-font-mono); font-size: 12px; letter-spacing: var(--caup-track-label);
+        text-transform: uppercase; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.3); margin-bottom: 16px;
+      }
+      .caup-do ul, .caup-dont ul { list-style: none; margin: 0; padding: 0; }
+      .caup-do li, .caup-dont li { display: flex; gap: 10px; padding: 7px 0; font-size: 15px; }
+      .caup-do li::before { content: '+'; font-family: var(--caup-font-mono); font-weight: 700; }
+      .caup-dont li::before { content: '×'; font-family: var(--caup-font-mono); font-weight: 700; color: var(--caup-accent); }
+
+      /* --- Checklist (fundo escuro) --- */
+      .caup-check { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--caup-line-dark); }
+      .caup-check .box { width: 22px; height: 22px; border: 2px solid var(--caup-green); border-radius: 5px; flex: none; margin-top: 2px; }
+      .caup-check .lbl { font-family: var(--caup-font-mono); font-size: 11px; letter-spacing: var(--caup-track-label); text-transform: uppercase; color: var(--caup-on-dark-soft); }
+      .caup-check .ttl { font-family: var(--caup-font-display); font-weight: 700; color: #fff; }
+
+      /* --- Footer / rodapé de página --- */
+      .caup-footer {
+        display: flex; justify-content: space-between; align-items: center;
+        font-family: var(--caup-font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+        color: var(--caup-ink-soft); padding-top: 16px; border-top: 1px solid var(--caup-line);
+      }
+      .caup-footer .page b { color: var(--caup-ink); }
+      .on-dark .caup-footer { color: var(--caup-on-dark-soft); border-color: var(--caup-line-dark); }
+      .on-dark .caup-footer .page b { color: #fff; }
+
+      /* --- Superfícies (capa/seção) --- */
+      .caup-surface-dark { background: var(--caup-grad-dark); color: var(--caup-white); }
+      .caup-surface-brand { background: var(--caup-grad-brand); color: var(--caup-white); }
+      .caup-surface-light { background: var(--caup-paper); color: var(--caup-ink); }
+      .caup-surface-dark .caup-display, .caup-surface-brand .caup-display { color: #fff; }
+
+      /* Wordmark */
+      .caup-wordmark { font-family: var(--caup-font-display); font-weight: 800; font-size: 26px; }
+
+      /* =====================================================================
+         LAYOUT DO STYLE GUIDE (não faz parte do sistema — só desta página)
+         ===================================================================== */
+      .sg-wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 80px; }
+      .sg-top {
+        background: var(--caup-grad-dark); color: #fff; padding: 64px 0 56px; margin-bottom: 48px;
+      }
+      .sg-top .inner { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+      .sg-section { margin: 56px 0; }
+      .sg-section > h2.caup-h2 { color: var(--caup-ink); margin-bottom: 6px; }
+      .sg-section > .desc { color: var(--caup-ink-soft); margin: 0 0 24px; max-width: 70ch; }
+      .sg-card { background: #fff; border: 1px solid var(--caup-line); border-radius: var(--caup-radius); padding: 28px; }
+      .sg-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .sg-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .sg-row-arrow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0; }
+      .sg-arrow { font-family: var(--caup-font-mono); color: var(--caup-ink-soft); padding: 0 10px; font-size: 18px; }
+      .sg-stack > * + * { margin-top: 14px; }
+
+      /* Swatches de cor */
+      .sw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+      .sw { border: 1px solid var(--caup-line); border-radius: var(--caup-radius); overflow: hidden; background: #fff; }
+      .sw .chip { height: 78px; }
+      .sw .meta { padding: 10px 12px; font-family: var(--caup-font-mono); font-size: 11px; line-height: 1.5; }
+      .sw .meta .nm { color: var(--caup-ink); font-weight: 700; letter-spacing: 0.04em; }
+      .sw .meta .hex { color: var(--caup-ink-soft); text-transform: uppercase; }
+
+      /* Tipografia demo */
+      .type-row { padding: 14px 0; border-bottom: 1px solid var(--caup-line); }
+      .type-row .tag { font-family: var(--caup-font-mono); font-size: 11px; letter-spacing: var(--caup-track-label); text-transform: uppercase; color: var(--caup-green); }
+
+      @media (max-width: 820px) {
+        .sg-grid-3, .sg-grid-2, .caup-timeline { grid-template-columns: 1fr; }
+        .sg-row-arrow { grid-template-columns: 1fr; }
+        .caup-timeline::before { display: none; }
+        .sg-arrow { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ================= CAPA DO GUIA ================= -->
+    <header class="sg-top on-dark">
+      <div class="inner">
+        <span class="caup-eyebrow">Capital Upgrade · Design System</span>
+        <h1 class="caup-display" style="margin: 18px 0 14px">
+          Identidade<br /><span class="caup-accent-text">visual</span>
+        </h1>
+        <p class="caup-lede">
+          Sistema derivado do Playbook Comercial "Processo de Indicação". Trinca
+          tipográfica (grotesca + serifa + mono), verde de marca sobre fundos
+          escuros e off-white. Tudo abaixo é renderizado com os tokens reais.
+        </p>
+        <div class="caup-footer" style="margin-top: 40px">
+          <span>Capital Upgrade · Playbook Comercial</span>
+          <span class="page">Desenvolvido por V4 Ferraz Piai &amp; Co</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="sg-wrap">
+      <!-- ================= CORES ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Fundamentos</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Paleta de cores</h2>
+        <p class="desc">Verde de marca + verde claro (para fundos escuros) + verde vibrante de realce, sobre as superfícies escura e off-white.</p>
+        <div class="sw-grid">
+          <div class="sw"><div class="chip" style="background:#15a34a"></div><div class="meta"><div class="nm">--caup-green</div><div class="hex">#15A34A</div></div></div>
+          <div class="sw"><div class="chip" style="background:#0f8b3e"></div><div class="meta"><div class="nm">--caup-green-strong</div><div class="hex">#0F8B3E</div></div></div>
+          <div class="sw"><div class="chip" style="background:#3ddc84"></div><div class="meta"><div class="nm">--caup-accent</div><div class="hex">#3DDC84</div></div></div>
+          <div class="sw"><div class="chip" style="background:#e4f4ea"></div><div class="meta"><div class="nm">--caup-green-soft</div><div class="hex">#E4F4EA</div></div></div>
+          <div class="sw"><div class="chip" style="background:#0a2e1e"></div><div class="meta"><div class="nm">--caup-bg-dark</div><div class="hex">#0A2E1E</div></div></div>
+          <div class="sw"><div class="chip" style="background:#06190f"></div><div class="meta"><div class="nm">--caup-bg-dark-2</div><div class="hex">#06190F</div></div></div>
+          <div class="sw"><div class="chip" style="background:#eef1ed"></div><div class="meta"><div class="nm">--caup-paper</div><div class="hex">#EEF1ED</div></div></div>
+          <div class="sw"><div class="chip" style="background:#13201a"></div><div class="meta"><div class="nm">--caup-ink</div><div class="hex">#13201A</div></div></div>
+          <div class="sw"><div class="chip" style="background:#5b6b62"></div><div class="meta"><div class="nm">--caup-ink-soft</div><div class="hex">#5B6B62</div></div></div>
+          <div class="sw"><div class="chip" style="background:var(--caup-grad-brand)"></div><div class="meta"><div class="nm">--caup-grad-brand</div><div class="hex">gradiente</div></div></div>
+        </div>
+      </section>
+
+      <!-- ================= TIPOGRAFIA ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Fundamentos</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Tipografia</h2>
+        <p class="desc">Três papéis: <b>Hanken Grotesk</b> (display/títulos), <b>Source Serif 4</b> (corpo) e <b>JetBrains Mono</b> (eyebrows, números, scripts, rodapé).</p>
+        <div class="sg-card">
+          <div class="type-row"><div class="tag">Display · Hanken Grotesk 800</div><div class="caup-display">Processo de <span class="caup-accent-text">Indicação</span></div></div>
+          <div class="type-row"><div class="tag">H1 · 800</div><div class="caup-h1">O valor vem antes do pedido.</div></div>
+          <div class="type-row"><div class="tag">H2 · 700</div><div class="caup-h2">Como colher na prática</div></div>
+          <div class="type-row"><div class="tag">H3 · 700</div><div class="caup-h3">Gerar valor real</div></div>
+          <div class="type-row"><div class="tag">Lede · Source Serif</div><div class="caup-lede">Como transformar o valor entregue na call em pipeline qualificado — de forma estruturada e repetível.</div></div>
+          <div class="type-row"><div class="tag">Corpo · Source Serif 16</div><p style="margin:6px 0 0;max-width:70ch">A indicação é consequência de valor entregue, não uma interrupção no final da conversa. Quando o lead percebe o valor, recomendar vira reação natural.</p></div>
+          <div class="type-row" style="border:none"><div class="tag">Label / Mono</div><div class="caup-eyebrow no-dot" style="margin-top:6px">Momento 01 · Início da call</div></div>
+        </div>
+      </section>
+
+      <!-- ================= TÍTULOS & REALCES ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Componentes</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Títulos &amp; realces</h2>
+        <p class="desc">Headings bicolor, realce em bloco verde e régua de apoio.</p>
+        <div class="sg-card sg-stack">
+          <div><span class="caup-eyebrow">O princípio</span></div>
+          <h2 class="caup-h1">Indicação não se pede.<br /><span class="caup-highlight">Se conquista.</span></h2>
+          <hr class="caup-rule" />
+          <h3 class="caup-h2" style="margin-top:10px">A indicação no <span class="caup-accent-text">fluxo</span> da venda.</h3>
+        </div>
+      </section>
+
+      <!-- ================= CALLOUT & SCRIPT ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Componentes</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Callout &amp; bloco de script</h2>
+        <div class="sg-stack">
+          <div class="caup-callout"><span><b>Escopo:</b> reuniões de aquisição de cliente. Não se aplica a expansão.</span></div>
+          <div class="caup-script">
+            <span class="caup-eyebrow">Script · use no início</span>
+            <p>"Meu primeiro objetivo aqui é gerar o máximo de valor para vocês. Se eu conseguir gerar esse valor, no final vou abrir um espaço para que você me recomende alguns empresários. <span class="key">Combinado?</span>"</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CARDS ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Componentes</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Cards (claro, escuro e numerado)</h2>
+        <p class="desc">Sequência de etapas — o card escuro marca a etapa em destaque/ativa.</p>
+        <div class="sg-row-arrow">
+          <div class="caup-card">
+            <span class="caup-eyebrow no-dot">01 · Entregar</span>
+            <h3 class="caup-h3" style="margin:10px 0 6px">Gerar valor real</h3>
+            <p style="margin:0;color:var(--caup-ink-soft)">Análise diagnóstica e melhorias que o lead já pode executar amanhã.</p>
+          </div>
+          <span class="sg-arrow">→</span>
+          <div class="caup-card">
+            <span class="caup-eyebrow no-dot">02 · Conquistar</span>
+            <h3 class="caup-h3" style="margin:10px 0 6px">Construir autoridade</h3>
+            <p style="margin:0;color:var(--caup-ink-soft)">O lead compra primeiro você, depois a ideia e só então o serviço.</p>
+          </div>
+          <span class="sg-arrow">→</span>
+          <div class="caup-card dark">
+            <span class="caup-eyebrow no-dot">03 · Coletar</span>
+            <h3 class="caup-h3" style="margin:10px 0 6px">Pedir a indicação</h3>
+            <p style="margin:0">Com valor entregue, a indicação é consequência. O pedido é direto.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= NÚMERO FANTASMA ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Componentes</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Número fantasma + badge</h2>
+        <div class="sg-card" style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+          <span class="caup-ghost-num">01</span>
+          <div>
+            <span class="caup-eyebrow no-dot">Momento 01 · Início da call</span>
+            <h3 class="caup-h2" style="margin-top:6px">Microcompromisso de Indicação</h3>
+          </div>
+          <span class="caup-num-badge" style="margin-left:auto">1</span>
+        </div>
+      </section>
+
+      <!-- ================= TIMELINE ================= -->
+      <section class="sg-section caup-surface-dark on-dark" style="border-radius:var(--caup-radius-lg);padding:40px 28px">
+        <span class="caup-eyebrow">A régua da call</span>
+        <h2 class="caup-h2" style="color:#fff;margin:8px 0 28px">A indicação no <span class="caup-accent-text">fluxo</span> da venda.</h2>
+        <div class="caup-timeline">
+          <div class="caup-tl-item"><div class="caup-tl-top">Início</div><div class="caup-tl-dot"></div><div class="caup-tl-num">Momento 01</div><h3 class="caup-h3" style="color:#fff;margin:6px 0 6px">Microcompromisso</h3><p style="margin:0;color:var(--caup-on-dark-soft);font-size:14px">Planta a semente do espaço de indicação.</p></div>
+          <div class="caup-tl-item"><div class="caup-tl-top">Após o SPIN</div><div class="caup-tl-dot"></div><div class="caup-tl-num">Momento 02</div><h3 class="caup-h3" style="color:#fff;margin:6px 0 6px">Contextualização</h3><p style="margin:0;color:var(--caup-on-dark-soft);font-size:14px">Conecta desafios a situações comuns.</p></div>
+          <div class="caup-tl-item"><div class="caup-tl-top">Final</div><div class="caup-tl-dot"></div><div class="caup-tl-num">Momento 03</div><h3 class="caup-h3" style="color:#fff;margin:6px 0 6px">Pitch + Coleta</h3><p style="margin:0;color:var(--caup-on-dark-soft);font-size:14px">Colhe os contatos na hora, via WhatsApp.</p></div>
+        </div>
+      </section>
+
+      <!-- ================= PASSOS ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Componentes</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Lista de passos</h2>
+        <div class="sg-stack">
+          <div class="caup-card caup-step"><span class="caup-num-badge">1</span><div><h3 class="caup-h3">Mande o "Oi" no WhatsApp durante a call</h3><p>A coleta acontece ao vivo, não depois.</p></div></div>
+          <div class="caup-card caup-step"><span class="caup-num-badge">2</span><div><h3 class="caup-h3">Peça para o lead verificar a mensagem</h3><p>Cria ação imediata e tira a fricção do depois.</p></div></div>
+        </div>
+      </section>
+
+      <!-- ================= DO / DONT ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Componentes</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Faça / Nunca faça</h2>
+        <div class="sg-grid-2">
+          <div class="caup-do">
+            <div class="caup-col-title">Faça</div>
+            <ul><li>Entregue valor real antes de pedir</li><li>Plante o microcompromisso na abertura</li><li>Peça pelo máximo de contatos</li></ul>
+          </div>
+          <div class="caup-dont">
+            <div class="caup-col-title">Nunca faça</div>
+            <ul><li>Pedir indicação sem ter entregue valor</li><li>Inventar dores que não existem</li><li>Deixar o pedido para depois da call</li></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CHECKLIST ================= -->
+      <section class="sg-section caup-surface-dark on-dark" style="border-radius:var(--caup-radius-lg);padding:40px 28px">
+        <span class="caup-eyebrow">Checklist da call</span>
+        <h2 class="caup-h2" style="color:#fff;margin:8px 0 22px">Antes de encerrar, confirme</h2>
+        <div class="sg-grid-2">
+          <div class="caup-check"><span class="box"></span><div><div class="lbl">Abertura</div><div class="ttl">Plantei o microcompromisso</div></div></div>
+          <div class="caup-check"><span class="box"></span><div><div class="lbl">Meio</div><div class="ttl">Conectei a indicação às dores</div></div></div>
+          <div class="caup-check"><span class="box"></span><div><div class="lbl">Valor</div><div class="ttl">Entreguei análise e insights</div></div></div>
+          <div class="caup-check"><span class="box"></span><div><div class="lbl">Coleta</div><div class="ttl">Mandei o "Oi" no WhatsApp</div></div></div>
+        </div>
+      </section>
+
+      <!-- ================= BOTÕES & FOOTER ================= -->
+      <section class="sg-section">
+        <span class="caup-eyebrow">Componentes</span>
+        <h2 class="caup-h2" style="margin-top: 8px">Botões &amp; rodapé</h2>
+        <div class="sg-card sg-stack">
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a class="caup-btn">Ação primária</a>
+            <a class="caup-btn ghost">Ação secundária</a>
+          </div>
+          <div class="caup-footer"><span>Capital Upgrade</span><span>Desenvolvido por V4 Ferraz Piai &amp; Co</span><span class="page"><b>07</b> / 12</span></div>
+        </div>
+      </section>
+
+      <!-- ================= SUPERFÍCIE DE MARCA (capa/encerramento) ================= -->
+      <section class="sg-section caup-surface-brand on-dark" style="border-radius:var(--caup-radius-lg);padding:64px 40px">
+        <span class="caup-eyebrow">Capital Upgrade</span>
+        <h2 class="caup-display" style="margin:18px 0 14px">Valor primeiro.<br />Indicação sempre.</h2>
+        <p class="caup-lede" style="color:rgba(255,255,255,.85)">Processo estruturado, repetível e independente do vendedor.</p>
+        <div style="display:flex;justify-content:flex-end;margin-top:32px"><span class="caup-wordmark">Capital Upgrade</span></div>
+      </section>
+    </div>
+  </body>
+</html>

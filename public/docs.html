@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Upgrade · Documentação de extração de dados</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .doc-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 28px;
+        background: var(--caup-grad-dark);
+        color: #fff;
+        border-bottom: 1px solid var(--caup-bg-dark-2);
+      }
+      .doc-topbar .brand-mark {
+        display: inline-grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        background: var(--caup-green);
+        color: #fff;
+        font-family: var(--font-display);
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        font-size: 12px;
+        border-radius: 10px;
+      }
+      .doc-topbar h1 {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+      }
+      .doc-back {
+        margin-left: auto;
+        border: 1px solid var(--caup-line-dark);
+        background: transparent;
+        color: #fff;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 13px;
+        text-decoration: none;
+        padding: 9px 16px;
+        border-radius: 10px;
+        white-space: nowrap;
+      }
+      .doc-back:hover { background: rgba(255, 255, 255, 0.08); }
+
+      .doc {
+        max-width: 980px;
+        margin: 28px auto 80px;
+        padding: 36px 44px;
+        background: var(--card);
+        border: 1px solid var(--caup-line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        line-height: 1.7;
+        color: var(--caup-ink);
+        font-family: var(--font-serif);
+      }
+      .doc h1, .doc h2, .doc h3 { font-family: var(--font-display); }
+      .doc h1 { font-size: 28px; font-weight: 800; margin: 8px 0 4px; letter-spacing: -0.01em; }
+      .doc h2 {
+        font-size: 21px;
+        font-weight: 700;
+        margin: 36px 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--caup-green);
+      }
+      .doc h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+      .doc p, .doc li { font-size: 15px; }
+      .doc a { color: var(--caup-green); font-weight: 600; }
+      .doc strong { color: var(--caup-ink); }
+      .doc code {
+        background: var(--caup-green-soft);
+        color: var(--caup-green-strong);
+        padding: 1px 6px;
+        border-radius: 6px;
+        font-size: 12.5px;
+        font-family: var(--font-mono);
+      }
+      .doc pre {
+        background: var(--caup-bg-dark-2);
+        color: #e6efe9;
+        padding: 16px 18px;
+        border-radius: 12px;
+        overflow-x: auto;
+        font-size: 12.5px;
+        line-height: 1.55;
+        font-family: var(--font-mono);
+      }
+      .doc pre code { background: none; color: inherit; padding: 0; }
+      .doc blockquote {
+        margin: 16px 0;
+        padding: 12px 18px;
+        background: var(--caup-green-soft);
+        border-left: 4px solid var(--caup-green);
+        border-radius: 0 8px 8px 0;
+        color: var(--caup-ink);
+      }
+      .doc blockquote p { margin: 4px 0; }
+      .doc table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        font-size: 13px;
+        font-family: var(--font-display);
+      }
+      .doc th, .doc td {
+        border: 1px solid var(--caup-line);
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+      .doc th {
+        background: var(--caup-bg-dark);
+        color: #fff;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .doc tr:nth-child(even) td { background: #f6f9f6; }
+      .doc hr { border: none; border-top: 1px solid var(--caup-line); margin: 28px 0; }
+      .doc ul, .doc ol { padding-left: 22px; }
+      .doc-loading { padding: 60px; text-align: center; color: var(--caup-ink-soft); font-family: var(--font-mono); }
+      .doc-error {
+        padding: 16px 20px;
+        background: var(--red-soft);
+        color: var(--red);
+        border-radius: var(--radius);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <span class="brand-mark">CAUP</span>
+      <h1>Documentação · Como os dados são extraídos</h1>
+      <a class="doc-back" href="index.html">← Voltar ao dashboard</a>
+    </header>
+
+    <main>
+      <article id="doc" class="doc">
+        <div class="doc-loading">Carregando documentação…</div>
+      </article>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      (async function () {
+        const el = document.getElementById('doc');
+        try {
+          const res = await fetch('/doc-files/extracao-de-dados.md', { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const md = await res.text();
+          // marked converte o markdown (tabelas, código, etc.) em HTML.
+          el.innerHTML = marked.parse(md, { gfm: true, breaks: false });
+        } catch (err) {
+          el.innerHTML =
+            '<div class="doc-error">Não foi possível carregar a documentação: ' +
+            err.message +
+            '</div>';
+        }
+      })();
+    </script>
+  </body>
+</html>

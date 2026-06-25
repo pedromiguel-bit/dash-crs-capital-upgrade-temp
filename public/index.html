@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Upgrade · Dashboard</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Barra de filtros (contexto) -->
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">CAUP</span></div>
+      <div class="filter">
+        <label>PERÍODO</label>
+        <div class="period">
+          <input type="date" id="f-start" />
+          <span>até</span>
+          <input type="date" id="f-end" />
+        </div>
+      </div>
+      <div class="filter">
+        <label>VISÃO</label>
+        <div class="seg" id="f-view">
+          <button type="button" class="seg-btn active" data-view="mensal">Mensal</button>
+          <button type="button" class="seg-btn" data-view="safra">Safra</button>
+        </div>
+      </div>
+      <div class="filter">
+        <label>REGIÃO</label>
+        <select id="f-regional">
+          <option value="">Todos</option>
+          <option value="sao-paulo">São Paulo</option>
+          <option value="fortaleza">Fortaleza</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label>CANAL</label>
+        <select id="f-canal">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <button id="f-apply" class="apply">Atualizar</button>
+      <a class="docs-link" href="docs.html" title="Como os dados são extraídos">📄 Documentação</a>
+    </header>
+
+    <main id="app">
+      <div id="loading" class="loading" hidden>Carregando dados da Ploomes…</div>
+      <div id="error" class="error" hidden></div>
+
+      <!-- 2. Funil geral -->
+      <section id="funnel" class="funnel" hidden></section>
+
+      <!-- 3. Eficiencia -->
+      <section id="efficiency" class="efficiency" hidden></section>
+
+      <!-- 4. Desempenho por regional -->
+      <section class="regional-wrap" hidden>
+        <h2 class="section-title">Desempenho por Região</h2>
+        <div id="regional" class="regional-grid"></div>
+      </section>
+
+      <!-- 5. Ranking de SDR (por agendamentos) -->
+      <section class="ranking-wrap" data-rank="sdr" hidden>
+        <div class="rank-head-row">
+          <h2 class="section-title">Ranking de SDR · ordenar por (maior → menor):</h2>
+          <div class="seg" id="rank-sort">
+            <button type="button" class="seg-btn" data-sort="taxaConexao">Tx Conexão</button>
+            <button type="button" class="seg-btn active" data-sort="taxaAgendamento">Tx Agend.</button>
+            <button type="button" class="seg-btn" data-sort="taxaReuniao">Tx Reunião</button>
+            <button type="button" class="seg-btn" data-sort="winRate">Win Rate</button>
+            <button type="button" class="seg-btn" data-sort="hitRate">Hit Rate</button>
+          </div>
+        </div>
+        <div id="rank-sdr" class="regional-grid"></div>
+      </section>
+
+      <!-- 6. Ranking de Closer (base = reuniões realizadas) -->
+      <section class="ranking-wrap" data-rank="closer" hidden>
+        <div class="rank-head-row">
+          <h2 class="section-title">Ranking de Closer · ordenar por (maior → menor):</h2>
+          <div class="seg" id="closer-sort">
+            <button type="button" class="seg-btn active" data-sort="vendas">Vendas</button>
+            <button type="button" class="seg-btn" data-sort="winRate">Win Rate</button>
+            <button type="button" class="seg-btn" data-sort="realizadas">Realizadas</button>
+            <button type="button" class="seg-btn" data-sort="faturamento">Faturamento</button>
+          </div>
+        </div>
+        <div id="rank-closer" class="regional-grid"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

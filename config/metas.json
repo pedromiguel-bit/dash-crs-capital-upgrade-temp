@@ -1,0 +1,19 @@
+{
+  "_comentario": "Preencha as metas mensais por regional e etapa. Use null onde nao houver meta (o dashboard mostra '—'). 'faturamento' e 'ticket' sao em R$.",
+  "sao-paulo": {
+    "leads": null,
+    "conexao": null,
+    "agendamento": null,
+    "venda": null,
+    "ticket": null,
+    "faturamento": null
+  },
+  "fortaleza": {
+    "leads": null,
+    "conexao": null,
+    "agendamento": null,
+    "venda": null,
+    "ticket": null,
+    "faturamento": null
+  }
+}
