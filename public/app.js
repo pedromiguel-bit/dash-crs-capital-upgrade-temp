@@ -265,14 +265,49 @@ function renderRegional(regionais) {
 }
 
 // ---------- Rankings (SDR / Closer) ----------
+// Percentil (interpolado) de um array já ordenado.
+function percentile(sorted, p) {
+  if (!sorted.length) return null;
+  const idx = (sorted.length - 1) * p;
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+}
+
+// Heatmap por quartil: >= P75 = melhor (verde); <= P25 = pior (vermelho);
+// meio = âmbar. Tons claros via CSS. Sem heatmap se houver < 3 valores ou
+// distribuição sem dispersão.
+function makeBucketer(values) {
+  const nums = values.filter((v) => typeof v === 'number' && isFinite(v));
+  if (nums.length < 3) return () => '';
+  const sorted = [...nums].sort((a, b) => a - b);
+  const p25 = percentile(sorted, 0.25);
+  const p75 = percentile(sorted, 0.75);
+  if (p25 === p75) return () => '';
+  return (v) => {
+    if (typeof v !== 'number' || !isFinite(v)) return '';
+    if (v >= p75) return 'hm-good';
+    if (v <= p25) return 'hm-bad';
+    return 'hm-mid';
+  };
+}
+
 // Monta um card de ranking por região com as colunas informadas.
 function rankCard(label, rows, cols) {
+  // Um bucketer (quartis) por coluna, calculado sobre as linhas deste card.
+  const buckets = {};
+  cols.forEach((c) => (buckets[c.key] = makeBucketer(rows.map((r) => r[c.key]))));
+
   const head = cols.map((c) => `<th>${c.title}</th>`).join('');
   const body = rows.length
     ? rows
         .map((r, i) => {
           const cells = cols
-            .map((c) => `<td class="${c.cls || ''}">${c.fmt(r[c.key], r)}</td>`)
+            .map((c) => {
+              const cls = [c.cls || '', buckets[c.key](r[c.key])].filter(Boolean).join(' ');
+              return `<td class="${cls}">${c.fmt(r[c.key], r)}</td>`;
+            })
             .join('');
           return `<tr><td class="rank-pos">${i + 1}</td><td class="rank-name">${r.name}</td>${cells}</tr>`;
         })

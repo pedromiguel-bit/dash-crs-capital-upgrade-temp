@@ -376,6 +376,10 @@ table.reg-table { width: 100%; border-collapse: collapse; }
 }
 .rank-table .rank-name { text-align: left; font-weight: 700; }
 .rank-table th:nth-child(2) { text-align: left; }
+/* Heatmap por quartil nas colunas dos rankings (tons claros e transparentes) */
+.rank-table td.hm-good { background: rgba(21, 163, 74, 0.12); }
+.rank-table td.hm-mid { background: rgba(245, 158, 11, 0.10); }
+.rank-table td.hm-bad { background: rgba(210, 59, 59, 0.10); }
 .rank-table tbody tr { border-top: 1px solid var(--caup-line); }
 .rank-table tbody tr:first-child .rank-pos { color: var(--caup-green); }
 .rank-table .rank-empty {
