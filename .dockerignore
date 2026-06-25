@@ -1,0 +1,21 @@
+# Dependências (reinstaladas no build)
+node_modules
+
+# Git
+.git
+.gitignore
+
+# Segredos / ambiente (as variáveis são setadas no Easypanel)
+.env
+.env.*
+
+# Conteúdo interno não versionado / não necessário em runtime
+vault
+specs
+design-system
+
+# SO / editor / logs
+.DS_Store
+Thumbs.db
+.vscode
+*.log
