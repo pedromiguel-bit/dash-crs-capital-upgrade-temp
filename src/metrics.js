@@ -77,10 +77,10 @@ async function computeRegional(key, startIso, endIso, canal, view) {
   //     (campo de data preenchido em qualquer momento).
   const conexaoQuery = safra
     ? ploomes.count(`${p} and ${leadPeriod} and ${customFieldFilled(r.conexaoFieldId)}${canalF}`)
-    : ploomes.count(`${p} and ${customDateRange(r.conexaoFieldId, startIso, endIso)}${canalF}`);
+    : ploomes.countCustomDateInRange(`${p}${canalF}`, r.conexaoFieldId, startIso, endIso);
   const agendamentoQuery = safra
     ? ploomes.count(`${p} and ${leadPeriod} and ${customFieldFilled(r.agendamentoFieldId)}${canalF}`)
-    : ploomes.count(`${p} and ${customDateRange(r.agendamentoFieldId, startIso, endIso)}${canalF}`);
+    : ploomes.countCustomDateInRange(`${p}${canalF}`, r.agendamentoFieldId, startIso, endIso);
 
   // Reuniao realizada:
   //   - Fortaleza (reuniaoFromCloserCreate): entrada no Funil Closer. Mensal =
@@ -94,7 +94,7 @@ async function computeRegional(key, startIso, endIso, canal, view) {
   } else if (r.showFieldId) {
     reuniaoQuery = safra
       ? ploomes.count(`${p} and ${leadPeriod} and ${customFieldFilled(r.showFieldId)}${canalF}`)
-      : ploomes.count(`${p} and ${customDateRange(r.showFieldId, startIso, endIso)}${canalF}`);
+      : ploomes.countCustomDateInRange(`${p}${canalF}`, r.showFieldId, startIso, endIso);
   } else if (r.showFlagFieldId) {
     reuniaoQuery = safra
       ? ploomes.count(`${p} and ${leadPeriod} and ${customBoolTrue(r.showFlagFieldId)}${canalF}`)

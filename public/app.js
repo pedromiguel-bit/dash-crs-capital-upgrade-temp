@@ -276,11 +276,12 @@ function percentile(sorted, p) {
 }
 
 // Heatmap por quartil: >= P75 = melhor (verde); <= P25 = pior (vermelho);
-// meio = âmbar. Tons claros via CSS. Sem heatmap se houver < 3 valores ou
-// distribuição sem dispersão.
+// meio = âmbar. Tons claros via CSS. Funciona a partir de 2 valores (caso de SP,
+// com poucos SDRs: o melhor fica verde e o pior vermelho). Sem heatmap se houver
+// < 2 valores (ex.: 1 SDR) ou distribuição sem dispersão.
 function makeBucketer(values) {
   const nums = values.filter((v) => typeof v === 'number' && isFinite(v));
-  if (nums.length < 3) return () => '';
+  if (nums.length < 2) return () => '';
   const sorted = [...nums].sort((a, b) => a - b);
   const p25 = percentile(sorted, 0.25);
   const p75 = percentile(sorted, 0.75);

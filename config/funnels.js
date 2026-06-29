@@ -48,6 +48,11 @@ module.exports = {
       // Funil unico: a venda e o faturamento saem do proprio pipelineId.
       // Exclusao: desconsiderar as vendas/faturamento da Cristine Rocha.
       excludeWonOwnerIds: [110072902], // Cristine Rocha (NAO confundir com 110074388)
+      // SP opera em funil unico: qualquer owner apareceria como SDR. Os SDRs reais
+      // sao apenas Pablo e Raissa, e eles participam do deal como OwnerId OU como
+      // CollaboratingUser. O ranking de SDR e calculado so para estes ids, casando
+      // por owner OU colaboracao (uniao). Ver sdrCollabFilter em src/rankings.js.
+      sdrOwnerIds: [110080004, 110077298], // Pablo Henrique, Raissa Borges
     },
     fortaleza: {
       label: 'Fortaleza',

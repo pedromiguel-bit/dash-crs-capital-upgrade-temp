@@ -199,6 +199,47 @@ async function wonByOwner(filter) {
     .map((r) => ({ ownerId: r.OwnerId, vendas: r.Total || 0, faturamento: r.Fat || 0 }));
 }
 
+// Conta deals cujo campo de DATA customizado (DateTimeValue) cai no período.
+// Evita o agregado OtherProperties/any(... ge..le), que é caro e instável na
+// Ploomes em pipelines grandes (chega a 504/timeout). Em vez disso lista só os
+// deals com o campo preenchido (ne null — barato/estável) e filtra o intervalo
+// localmente. `baseFilter` recorta pipeline/canal/etc. Retorna o total.
+async function countCustomDateInRange(baseFilter, fieldId, startIso, endIso) {
+  const rows = await listDeals(
+    `${baseFilter} and OtherProperties/any(o: o/FieldId eq ${fieldId} and o/DateTimeValue ne null)`,
+    { select: 'Id', expand: `OtherProperties($filter=FieldId eq ${fieldId};$select=DateTimeValue)` },
+  );
+  const s = new Date(startIso).getTime();
+  const e = new Date(endIso).getTime();
+  let total = 0;
+  for (const d of rows) {
+    const v = (d.OtherProperties || [])[0];
+    if (!v || !v.DateTimeValue) continue;
+    const t = new Date(v.DateTimeValue).getTime();
+    if (t >= s && t <= e) total += 1;
+  }
+  return total;
+}
+
+// Igual ao countCustomDateInRange, mas agrupado por OwnerId. [{ ownerId, count }].
+async function countByOwnerCustomDateInRange(baseFilter, fieldId, startIso, endIso) {
+  const rows = await listDeals(
+    `${baseFilter} and OtherProperties/any(o: o/FieldId eq ${fieldId} and o/DateTimeValue ne null)`,
+    { select: 'Id,OwnerId', expand: `OtherProperties($filter=FieldId eq ${fieldId};$select=DateTimeValue)` },
+  );
+  const s = new Date(startIso).getTime();
+  const e = new Date(endIso).getTime();
+  const map = new Map();
+  for (const d of rows) {
+    if (d.OwnerId == null) continue;
+    const v = (d.OtherProperties || [])[0];
+    if (!v || !v.DateTimeValue) continue;
+    const t = new Date(v.DateTimeValue).getTime();
+    if (t >= s && t <= e) map.set(d.OwnerId, (map.get(d.OwnerId) || 0) + 1);
+  }
+  return [...map.entries()].map(([ownerId, count]) => ({ ownerId, count }));
+}
+
 // Resolve nomes de usuarios por Id (lote, com cache em memoria pelo processo).
 const _userCache = new Map();
 async function users(ids) {
@@ -216,4 +257,4 @@ async function users(ids) {
   return out;
 }
 
-module.exports = { count, sumRevenue, listDeals, origins, countByOwner, wonByOwner, users };
+module.exports = { count, sumRevenue, listDeals, origins, countByOwner, wonByOwner, countCustomDateInRange, countByOwnerCustomDateInRange, users };

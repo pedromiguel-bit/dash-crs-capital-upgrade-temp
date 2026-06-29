@@ -27,6 +27,13 @@ function customFieldFilled(fieldId) {
   return `OtherProperties/any(o: o/FieldId eq ${fieldId} and o/DateTimeValue ne null)`;
 }
 
+// SP é funil único: o SDR real (Pablo/Raissa) participa do deal como OwnerId OU
+// como CollaboratingUser. Este predicado casa o deal com um SDR específico pelas
+// duas formas (união), conforme definido para São Paulo.
+function sdrCollabFilter(id) {
+  return `(OwnerId eq ${id} or CollaboratingUsers/any(c: c/UserId eq ${id}))`;
+}
+
 // Campo "Vendedor" (usuário) = o CLOSER que fechou o negócio. Usado no breakdown
 // de hit rate por closer. Quando vazio, cai no OwnerId do deal de fechamento.
 const VENDEDOR_FIELD = 111066744;
@@ -144,9 +151,11 @@ async function closerRanking(r, p, c, startIso, endIso, canalF, safra) {
   } else {
     filter = `${c} and ${dateRange(safra ? 'StartDate' : 'CreateDate', startIso, endIso)}${canalF}`;
   }
+  let closerExpand = `OtherProperties($filter=FieldId eq ${VENDEDOR_FIELD};$select=UserValueId,UserValueName)`;
+  if (r.sdrOwnerIds) closerExpand += `,CollaboratingUsers($select=UserId)`;
   const deals = await ploomes.listDeals(filter, {
     select: 'Id,OwnerId,ContactId,StatusId,Amount',
-    expand: `OtherProperties($filter=FieldId eq ${VENDEDOR_FIELD};$select=UserValueId,UserValueName)`,
+    expand: closerExpand,
   });
 
   // SDR que originou cada reunião: FOR pelo ContactId; SP pelo OwnerId do deal.
@@ -173,8 +182,17 @@ async function closerRanking(r, p, c, startIso, endIso, canalF, safra) {
       b.vendas += 1;
       b.faturamento += d.Amount || 0;
     }
-    const sid = sdrOf(d);
-    if (sid != null) {
+    // SDR(s) que originaram a reunião: SP = todos os sdrOwnerIds que casam (owner
+    // ou colaborador); Fortaleza/demais = o SDR resolvido por sdrOf.
+    let sids;
+    if (r.sdrOwnerIds) {
+      const colab = new Set((d.CollaboratingUsers || []).map((cu) => cu.UserId));
+      sids = r.sdrOwnerIds.filter((id) => d.OwnerId === id || colab.has(id));
+    } else {
+      const s = sdrOf(d);
+      sids = s != null ? [s] : [];
+    }
+    for (const sid of sids) {
       const bs = b.sdrs[sid] || (b.sdrs[sid] = { sdrId: sid, name: null, realizadas: 0, vendas: 0 });
       bs.realizadas += 1;
       if (won) bs.vendas += 1;
@@ -190,12 +208,21 @@ async function sdrSafra(r, p, c, startIso, endIso, canalF) {
   const cohortPeriod = dateRange('StartDate', startIso, endIso);
   const fields = [r.conexaoFieldId, r.agendamentoFieldId, VENDEDOR_FIELD];
   if (r.showFieldId) fields.push(r.showFieldId);
-  const expand =
+  let expand =
     `OtherProperties($filter=${fields.map((f) => `FieldId eq ${f}`).join(' or ')}` +
     `;$select=FieldId,DateTimeValue,UserValueId,UserValueName)`;
 
+  // SP (funil único): restringe a coorte aos SDRs reais e traz CollaboratingUsers
+  // para atribuir o deal por OwnerId OU colaboração (união).
+  let cohortFilter = `${p} and ${cohortPeriod}${canalF}`;
+  if (r.sdrOwnerIds) {
+    const ors = r.sdrOwnerIds.map((id) => sdrCollabFilter(id)).join(' or ');
+    cohortFilter += ` and (${ors})`;
+    expand += `,CollaboratingUsers($select=UserId)`;
+  }
+
   // Coorte = deals do funil de aquisição que startaram no período.
-  const cohort = await ploomes.listDeals(`${p} and ${cohortPeriod}${canalF}`, {
+  const cohort = await ploomes.listDeals(cohortFilter, {
     select: 'Id,OwnerId,ContactId,StatusId',
     expand,
   });
@@ -226,8 +253,17 @@ async function sdrSafra(r, p, c, startIso, endIso, canalF) {
 
   const byOwner = {};
   for (const d of cohort) {
-    const o = d.OwnerId;
-    if (o == null) continue;
+    // SDR(s) deste deal: SP = todos os sdrOwnerIds que casam (owner ou colaborador);
+    // Fortaleza/demais = o próprio OwnerId.
+    let targets;
+    if (r.sdrOwnerIds) {
+      const colab = new Set((d.CollaboratingUsers || []).map((cu) => cu.UserId));
+      targets = r.sdrOwnerIds.filter((id) => d.OwnerId === id || colab.has(id));
+    } else {
+      targets = d.OwnerId != null ? [d.OwnerId] : [];
+    }
+    if (!targets.length) continue;
+
     const dt = {};
     let vendSelf = null; // vendedor no próprio deal (SP)
     for (const pr of d.OtherProperties || []) {
@@ -259,27 +295,29 @@ async function sdrSafra(r, p, c, startIso, endIso, canalF) {
     const agendR = agendStamp || realizadaR;
     const conexR = conexStamp || agendR;
 
-    const b =
-      byOwner[o] ||
-      (byOwner[o] = { ownerId: o, leads: 0, conexoes: 0, agendamentos: 0, realizadas: 0, vendas: 0, closers: {} });
-    b.leads += 1;
-    if (conexR) b.conexoes += 1;
-    if (agendR) b.agendamentos += 1;
-    if (realizadaR) b.realizadas += 1;
-    if (vendaR) b.vendas += 1;
+    for (const o of targets) {
+      const b =
+        byOwner[o] ||
+        (byOwner[o] = { ownerId: o, leads: 0, conexoes: 0, agendamentos: 0, realizadas: 0, vendas: 0, closers: {} });
+      b.leads += 1;
+      if (conexR) b.conexoes += 1;
+      if (agendR) b.agendamentos += 1;
+      if (realizadaR) b.realizadas += 1;
+      if (vendaR) b.vendas += 1;
 
-    if (realizadaR) {
-      const cid = (closerInfo && closerInfo.id) || 'sem-closer';
-      const bc =
-        b.closers[cid] ||
-        (b.closers[cid] = {
-          closerId: cid,
-          name: (closerInfo && closerInfo.name) || (cid === 'sem-closer' ? 'Sem closer' : null),
-          realizadas: 0,
-          vendas: 0,
-        });
-      bc.realizadas += 1;
-      if (vendaR) bc.vendas += 1;
+      if (realizadaR) {
+        const cid = (closerInfo && closerInfo.id) || 'sem-closer';
+        const bc =
+          b.closers[cid] ||
+          (b.closers[cid] = {
+            closerId: cid,
+            name: (closerInfo && closerInfo.name) || (cid === 'sem-closer' ? 'Sem closer' : null),
+            realizadas: 0,
+            vendas: 0,
+          });
+        bc.realizadas += 1;
+        if (vendaR) bc.vendas += 1;
+      }
     }
   }
 
@@ -291,8 +329,6 @@ async function sdrSafra(r, p, c, startIso, endIso, canalF) {
 // passar de 100% entre etapas (coortes diferentes) — é o esperado nessa visão.
 async function sdrMensal(r, p, c, startIso, endIso, canalF) {
   const leadsFilter = `${p} and ${dateRange('CreateDate', startIso, endIso)}${canalF}`;
-  const conexaoFilter = `${p} and ${customDateRange(r.conexaoFieldId, startIso, endIso)}${canalF}`;
-  const agendFilter = `${p} and ${customDateRange(r.agendamentoFieldId, startIso, endIso)}${canalF}`;
   const wonFilter = `${c} and StatusId eq ${wonStatusId} and ${dateRange('FinishDate', startIso, endIso)}${canalF}`;
   const vendExpand = `OtherProperties($filter=FieldId eq ${VENDEDOR_FIELD};$select=UserValueId,UserValueName)`;
 
@@ -309,8 +345,8 @@ async function sdrMensal(r, p, c, startIso, endIso, canalF) {
 
   const [leadsByOwner, conexaoByOwner, agendByOwner, closerDeals, wonDeals] = await Promise.all([
     ploomes.countByOwner(leadsFilter),
-    ploomes.countByOwner(conexaoFilter),
-    ploomes.countByOwner(agendFilter),
+    ploomes.countByOwnerCustomDateInRange(`${p}${canalF}`, r.conexaoFieldId, startIso, endIso),
+    ploomes.countByOwnerCustomDateInRange(`${p}${canalF}`, r.agendamentoFieldId, startIso, endIso),
     ploomes.listDeals(closerSideFilter, { select: 'Id,OwnerId,ContactId,StatusId', expand: vendExpand }),
     ploomes.listDeals(wonFilter, { select: 'Id,OwnerId,ContactId' }),
   ]);
@@ -356,6 +392,48 @@ async function sdrMensal(r, p, c, startIso, endIso, canalF) {
   return buildSdrRows(byOwner);
 }
 
+// MENSAL — São Paulo (funil único). Em vez de agrupar por OwnerId (o que jogava
+// todo mundo no ranking), calcula cada SDR real (r.sdrOwnerIds) por contagens
+// diretas, atribuindo o deal quando o SDR é OwnerId OU CollaboratingUser (união).
+async function sdrMensalCollab(r, p, c, startIso, endIso, canalF) {
+  const vendExpand = `OtherProperties($filter=FieldId eq ${VENDEDOR_FIELD};$select=UserValueId,UserValueName)`;
+  const byOwner = {};
+  await Promise.all(
+    r.sdrOwnerIds.map(async (id) => {
+      const sf = ` and ${sdrCollabFilter(id)}`;
+      const [leads, conexoes, agendamentos, vendas, realizadasDeals] = await Promise.all([
+        ploomes.count(`${p} and ${dateRange('CreateDate', startIso, endIso)}${canalF}${sf}`),
+        ploomes.countCustomDateInRange(`${p}${canalF}${sf}`, r.conexaoFieldId, startIso, endIso),
+        ploomes.countCustomDateInRange(`${p}${canalF}${sf}`, r.agendamentoFieldId, startIso, endIso),
+        ploomes.count(`${c} and StatusId eq ${wonStatusId} and ${dateRange('FinishDate', startIso, endIso)}${canalF}${sf}`),
+        ploomes.listDeals(`${c} and ${customDateRange(r.showFieldId, startIso, endIso)}${canalF}${sf}`, {
+          select: 'Id,StatusId',
+          expand: vendExpand,
+        }),
+      ]);
+      const b = (byOwner[id] = {
+        ownerId: id,
+        leads,
+        conexoes,
+        agendamentos,
+        realizadas: 0,
+        vendas,
+        closers: {},
+      });
+      for (const d of realizadasDeals) {
+        const vp = (d.OtherProperties || [])[0];
+        const cid = (vp && vp.UserValueId) || 'sem-closer';
+        const name = (vp && vp.UserValueName) || (cid === 'sem-closer' ? 'Sem closer' : null);
+        b.realizadas += 1;
+        const bc = b.closers[cid] || (b.closers[cid] = { closerId: cid, name, realizadas: 0, vendas: 0 });
+        bc.realizadas += 1;
+        if (d.StatusId === wonStatusId) bc.vendas += 1;
+      }
+    }),
+  );
+  return buildSdrRows(byOwner);
+}
+
 // Rankings de uma regional no período (com recorte opcional por canal/OriginId).
 async function computeRegionRankings(key, startIso, endIso, canalF, view) {
   const r = regionais[key];
@@ -364,10 +442,13 @@ async function computeRegionRankings(key, startIso, endIso, canalF, view) {
   const c = `PipelineId eq ${closerPid}`;
   const safra = view === 'safra';
 
-  // Ranking de SDR (5 métricas + breakdown por closer).
+  // Ranking de SDR (5 métricas + breakdown por closer). SP usa atribuição por
+  // owner-ou-colaborador restrita aos SDRs reais; demais regionais agrupam por owner.
   const sdr = safra
     ? await sdrSafra(r, p, c, startIso, endIso, canalF)
-    : await sdrMensal(r, p, c, startIso, endIso, canalF);
+    : r.sdrOwnerIds
+      ? await sdrMensalCollab(r, p, c, startIso, endIso, canalF)
+      : await sdrMensal(r, p, c, startIso, endIso, canalF);
 
   // Ranking de Closer (base = reuniões realizadas; win rate = venda ÷ realizada;
   // breakdown por SDR).
